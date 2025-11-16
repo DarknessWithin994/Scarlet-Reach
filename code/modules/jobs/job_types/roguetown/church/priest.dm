@@ -236,9 +236,10 @@ GLOBAL_LIST_EMPTY(heretical_players)
 	var/list/merged_spells = list()
 	var/list/present_spells = list()
 
-	// Keep spells that should always be retained
+	// Keep spells that should always be retained (non-miracle spells from virtues/traits + core priest spells)
 	for(var/obj/effect/proc_holder/spell/S in mind.spell_list)
-		if(S.type in always_keep_spells)
+		// Keep if it's in the always_keep list OR if it's not a miracle (from virtues, etc.)
+		if((S.type in always_keep_spells) || !S.miracle)
 			merged_spells += S
 			present_spells[S.type] = S
 
