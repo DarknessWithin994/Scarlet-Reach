@@ -247,11 +247,16 @@
 	color_key_names = list("Tails", "Tips")
 	can_wag = TRUE
 
+/datum/sprite_accessory/tail/tentaclemaw
+	name = "Tentacle (Maw)"
+	icon_state = "tentacle"
+	can_wag = TRUE
+	can_suck = TRUE
+
 /datum/sprite_accessory/tail/tentacle
 	name = "Tentacle"
 	icon_state = "tentacle"
 	can_wag = TRUE
-	can_suck = TRUE
 
 /datum/sprite_accessory/tail/tiger
 	name = "Tiger"
@@ -288,6 +293,10 @@
 
 /datum/sprite_accessory/tail/spade
 	name = "Succubus Spade Tail"
+	icon_state = "spade"
+
+/datum/sprite_accessory/tail/spademaw
+	name = "Succubus Spade Tail (Maw)"
 	icon_state = "spade"
 	can_suck = TRUE
 
@@ -351,6 +360,13 @@
 
 /datum/sprite_accessory/tail/tiefling/heart
 	name = "Succubus"
+	icon = 'icons/mob/sprite_accessory/tails/tiefling.dmi'
+	icon_state = "hearttail"
+	color_key_defaults = list(KEY_SKIN_COLOR)
+	can_wag = TRUE
+
+/datum/sprite_accessory/tail/tiefling/heartmaw
+	name = "Succubus (Maw)"
 	icon = 'icons/mob/sprite_accessory/tails/tiefling.dmi'
 	icon_state = "hearttail"
 	color_key_defaults = list(KEY_SKIN_COLOR)
