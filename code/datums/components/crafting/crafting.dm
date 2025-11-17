@@ -242,7 +242,7 @@
 				to_chat(user, span_warning("Something is in the way."))
 				return
 		for(var/obj/machinery/M in T)
-			if(S.density && !(R.ignoredensity))
+			if(M.density && !(R.ignoredensity))
 				to_chat(user, span_warning("Something is in the way."))
 				return
 	if(R.req_table)
