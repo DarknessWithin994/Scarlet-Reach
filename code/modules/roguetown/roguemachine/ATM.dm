@@ -165,7 +165,7 @@
 
 /obj/structure/roguemachine/atm/examine(mob/user)
 	. += ..()
-	. += span_info("The current tax rate on deposits is [SStreasury.tax_value * 100] percent. Nobles exempt. Non-noble foreigners are taxed at a 50% higher rate.")
+	. += span_info("The current tax rate on deposits is [SStreasury.tax_value * 100] percent. Nobles exempt. Non-noble foreigners are taxed at [(SStreasury.tax_value + SStreasury.foreigner_extra_tax) * 100] percent.")
 
 
 /obj/structure/roguemachine/atm/proc/drill(obj/structure/roguemachine/atm)

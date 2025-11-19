@@ -230,6 +230,15 @@ GLOBAL_LIST_INIT(laws_of_the_land, initialize_laws_of_the_land())
 				playsound(src, 'sound/misc/machinetalk.ogg', 100, FALSE, -1)
 				give_tax_popup(H)
 				return
+			if(findtext(message, "set foreigner tax"))
+				if(notlord || nocrown)
+					say("You are not my master!")
+					playsound(src, 'sound/misc/machineno.ogg', 100, FALSE, -1)
+					return
+				say("Foreigners with no noble blood shall be charged an extra...")
+				playsound(src, 'sound/misc/machinetalk.ogg', 100, FALSE, -1)
+				give_foreigner_tax_popup(H)
+				return
 			if(findtext(message, "become regent"))
 				if(nocrown)
 					say("You need the crown.")
@@ -291,6 +300,19 @@ GLOBAL_LIST_INIT(laws_of_the_land, initialize_laws_of_the_land())
 		SStreasury.tax_value = newtax / 100
 		priority_announce("The new tax in Scarlet Reach shall be [newtax] percent.", "The Generous Lord Decrees", pick('sound/misc/royal_decree.ogg', 'sound/misc/royal_decree2.ogg'), "Captain")
 
+/obj/structure/roguemachine/titan/proc/give_foreigner_tax_popup(mob/living/carbon/human/user)
+	if(!Adjacent(user))
+		return
+	var/maxtax = min(30, ((1-SStreasury.tax_value) * 100)) //Surcharge can't be over 30% and it can't make the total foreigner tax be greater than 100%
+	var/newtax = input(user, "Set how much extra foreigners will be taxed (0-[maxtax])", src, SStreasury.foreigner_extra_tax*100) as null|num
+	if(newtax)
+		if(!Adjacent(user))
+			return
+		if(findtext(num2text(newtax), "."))
+			return
+		newtax = CLAMP(newtax, 0, maxtax)
+		SStreasury.foreigner_extra_tax = newtax / 100
+		priority_announce("Foreigners with no noble blood will be taxed an extra [newtax] percent.", "The Generous Lord Decrees", pick('sound/misc/royal_decree.ogg', 'sound/misc/royal_decree2.ogg'), "Captain")
 
 /obj/structure/roguemachine/titan/proc/make_announcement(mob/living/user, raw_message)
 	if(!SScommunications.can_announce(user))

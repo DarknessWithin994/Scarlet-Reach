@@ -1,7 +1,6 @@
 #define RURAL_TAX 50 // Free money. A small safety pool for lowpop mostly
 #define TREASURY_TICK_AMOUNT 6 MINUTES
 #define EXPORT_ANNOUNCE_THRESHOLD 100
-#define FOREIGNER_TAX_MULTIPLIER 1.5 //Amount that the tax rate is multiplied by for foreigners
 
 /proc/send_ooc_note(msg, name, job)
 	var/list/names_to = list()
@@ -28,6 +27,7 @@ SUBSYSTEM_DEF(treasury)
 	wait = 1
 	priority = FIRE_PRIORITY_WATER_LEVEL
 	var/tax_value = 0.11
+	var/foreigner_extra_tax = 0.1 //The amount more that non-noble foreigners are charged in tax, additive (e.g. 20% base and 10% modifier is 30%). 10% by default, settable by the Throat between 0% and 30%
 	var/queens_tax = 0.10
 	var/treasury_value = 0
 	var/mint_multiplier = 0.8 // 1x is meant to leave a margin after standard 80% collectable. Less than Bathmatron.
@@ -170,7 +170,7 @@ SUBSYSTEM_DEF(treasury)
 		if(HAS_TRAIT(character, TRAIT_NOBLE))
 			bank_accounts[character] += amt
 		else if(HAS_TRAIT(character, TRAIT_OUTLANDER) && !HAS_TRAIT(character, TRAIT_INQUISITION)) //Outsiders who aren't inquisition get taxed extra
-			taxed_amount = round(amt * tax_value * FOREIGNER_TAX_MULTIPLIER)
+			taxed_amount = round(amt * (tax_value + foreigner_extra_tax))
 			amt -= taxed_amount
 			bank_accounts[character] += amt
 		else
