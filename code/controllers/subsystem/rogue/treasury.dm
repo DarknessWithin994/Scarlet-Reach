@@ -26,8 +26,9 @@ SUBSYSTEM_DEF(treasury)
 	name = "treasury"
 	wait = 1
 	priority = FIRE_PRIORITY_WATER_LEVEL
-	var/tax_value = 0.11
-	var/foreigner_extra_tax = 0.1 //The amount more that non-noble foreigners are charged in tax, additive (e.g. 20% base and 10% modifier is 30%). 10% by default, settable by the Throat between 0% and 30%
+	var/tax_value = 0.11 //The tax rate, default 11%
+	var/stockpile_tax = 0.05 //The amount contributions to the stockpile are taxed, default 5%, settable by the Throat
+	var/foreigner_extra_tax = 0.1 //The amount more that non-noble foreigners are charged in tax, additive (e.g. 20% base and 10% modifier is 30%). Default 10% , settable by the Throat
 	var/queens_tax = 0.10
 	var/treasury_value = 0
 	var/mint_multiplier = 0.8 // 1x is meant to leave a margin after standard 80% collectable. Less than Bathmatron.
@@ -106,8 +107,8 @@ SUBSYSTEM_DEF(treasury)
 	else
 		log_to_steward("+[amt] to treasury")
 
-//pays to account from treasury (payroll)
-/datum/controller/subsystem/treasury/proc/give_money_account(amt, target, source)
+//pays to account from treasury (payroll or stockpile deposits)
+/datum/controller/subsystem/treasury/proc/give_money_account(amt, target, source, stockpile = FALSE)
 	if(!amt)
 		return
 	if(!target)
@@ -167,16 +168,9 @@ SUBSYSTEM_DEF(treasury)
 	var/original_amt = amt
 	treasury_value += amt
 	if(character in bank_accounts)
-		if(HAS_TRAIT(character, TRAIT_NOBLE))
-			bank_accounts[character] += amt
-		else if(HAS_TRAIT(character, TRAIT_OUTLANDER) && !HAS_TRAIT(character, TRAIT_INQUISITION)) //Outsiders who aren't inquisition get taxed extra
-			taxed_amount = round(amt * (tax_value + foreigner_extra_tax))
-			amt -= taxed_amount
-			bank_accounts[character] += amt
-		else
-			taxed_amount = round(amt * tax_value)
-			amt -= taxed_amount
-			bank_accounts[character] += amt
+		taxed_amount = calculate_taxes(amt, character)
+		amt -= taxed_amount
+		bank_accounts[character] += amt
 	else
 		return FALSE
 
@@ -184,7 +178,19 @@ SUBSYSTEM_DEF(treasury)
 
 	return list(original_amt, taxed_amount)
 
-
+/datum/controller/subsystem/treasury/proc/calculate_taxes(amt, mob/living/carbon/human/character, stockpile = FALSE)
+	if(HAS_TRAIT(character, TRAIT_NOBLE))
+		return 0 //Skip the rest of the checks and calculations, nobles don't pay tax
+	var/truetax
+	if(!stockpile)
+		truetax = tax_value
+	else
+		truetax = stockpile_tax
+	if(HAS_TRAIT(character, TRAIT_OUTLANDER) && !HAS_TRAIT(character, TRAIT_INQUISITION)) //Outsiders who aren't inquisition get taxed extra
+		truetax += foreigner_extra_tax
+	
+	return round(amt * truetax)
+		
 /datum/controller/subsystem/treasury/proc/withdraw_money_account(amt, target)
 	if(!amt)
 		return
